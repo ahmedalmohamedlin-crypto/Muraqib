@@ -1,5 +1,6 @@
 import datetime
 import os
+import subprocess
 import threading
 import gspread
 import yt_dlp
@@ -10,7 +11,6 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask_apscheduler import APScheduler
 from werkzeug.security import check_password_hash
-from bot import run_telegram_bot
 
 sys.stdout.reconfigure(encoding='utf-8')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'change-me-in-render')
 scheduler = APScheduler()
-BOT_THREAD = None
+BOT_PROCESS = None
 
 STORED_HASH = "scrypt:32768:8:1$lPt4wnaE4ekUPGw3$9e79dd254d8b161113955f8ecce3af14fd28992a67a685d23915e423471442719ea6c6881c813a9b8205f90621af7410bf38c963900926d59757e245ce457d6b"
 DEFAULT_LOCAL_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
@@ -220,15 +220,21 @@ def run_flask():
 
 
 def start_background_services():
-    global BOT_THREAD
+    global BOT_PROCESS
     if os.getenv("ENABLE_TELEGRAM_BOT", "true").lower() not in {"1", "true", "yes", "on"}:
         print("ℹ️ Telegram bot disabled by configuration.")
         return
-    if BOT_THREAD is not None and BOT_THREAD.is_alive():
+    if BOT_PROCESS is not None and BOT_PROCESS.poll() is None:
         return
     try:
-        BOT_THREAD = threading.Thread(target=run_telegram_bot, daemon=True)
-        BOT_THREAD.start()
+        bot_path = os.path.join(BASE_DIR, "bot.py")
+        BOT_PROCESS = subprocess.Popen(
+            [sys.executable, bot_path],
+            cwd=BASE_DIR,
+            env=os.environ.copy(),
+            start_new_session=True,
+        )
+        print(f"🤖 Telegram bot process started with PID {BOT_PROCESS.pid}")
     except Exception as e:
         print(f"⚠️ Telegram bot could not start: {e}")
 

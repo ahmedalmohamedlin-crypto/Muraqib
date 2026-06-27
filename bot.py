@@ -645,5 +645,9 @@ def run_telegram_bot():
         release_bot_lock(lock_fd)
 
 
+if __name__ == "__main__":
+    run_telegram_bot()
+
+
 
 
