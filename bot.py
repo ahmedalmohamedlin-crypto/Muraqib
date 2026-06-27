@@ -24,6 +24,26 @@ LOCK_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.telegram_
 
 
 def acquire_bot_lock():
+    if os.path.exists(LOCK_FILE):
+        try:
+            with open(LOCK_FILE, 'r', encoding='utf-8') as f:
+                pid_text = f.read().strip()
+            if pid_text:
+                pid = int(pid_text)
+                os.kill(pid, 0)
+                print('⚠️ Telegram bot is already running from another process.')
+                return None
+        except (ProcessLookupError, PermissionError, ValueError, FileNotFoundError):
+            try:
+                os.remove(LOCK_FILE)
+            except FileNotFoundError:
+                pass
+        except OSError:
+            try:
+                os.remove(LOCK_FILE)
+            except FileNotFoundError:
+                pass
+
     try:
         fd = os.open(LOCK_FILE, os.O_CREAT | os.O_EXCL | os.O_RDWR)
         os.write(fd, str(os.getpid()).encode('utf-8'))
@@ -610,7 +630,11 @@ def run_telegram_bot():
     try:
         app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
         global ACCESS_TOKEN
-        ACCESS_TOKEN = get_access_token()
+        try:
+            ACCESS_TOKEN = get_access_token()
+        except Exception as e:
+            ACCESS_TOKEN = None
+            print(f"⚠️ Telegram bot started without an initial Salla token: {e}")
         app.add_handler(CommandHandler("start", start_command))
         app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
         print("🤖 Telegram bot is ready. Open Telegram and send /start")

@@ -233,13 +233,17 @@ def start_background_services():
         print(f"⚠️ Telegram bot could not start: {e}")
 
 
-if __name__ == "__main__":
-    # Start Scheduler
+def initialize_background_services():
     if not scheduler.running:
         scheduler.add_job(id='sync_6h', func=update_all_sheets, trigger='interval', hours=6)
         scheduler.start()
-
     start_background_services()
 
+
+# Start background services automatically for Render/Gunicorn and local runs.
+initialize_background_services()
+
+
+if __name__ == "__main__":
     # Start Web Server in the main process so Render keeps the service alive
     run_flask()
