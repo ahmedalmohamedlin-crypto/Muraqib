@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول</title>
+    <style>
+        body { font-family: sans-serif; background: #fe2c55; display: flex; height: 100vh; justify-content: center; align-items: center; margin: 0; }
+        .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 350px; text-align: center; }
+        h2 { margin-bottom: 25px; color: #333; }
+        input { width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; background: #333; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #000; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>تسجيل الدخول</h2>
+        <form method="POST">
+            <input type="password" name="password" placeholder="كلمة المرور" required autofocus>
+            <button type="submit">دخول</button>
+        </form>
+    </div>
+</body>
+</html>

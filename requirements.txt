@@ -1,0 +1,11 @@
+python-telegram-bot>=20.0
+flask
+flask-login
+flask-apscheduler
+gspread
+google-auth
+yt-dlp
+requests
+pytz
+werkzeug
+gunicorn

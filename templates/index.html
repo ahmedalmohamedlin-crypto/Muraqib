@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدير الجداول | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #fe2c55; /* TikTok Red */
+            --secondary: #25f4ee; /* TikTok Cyan */
+            --dark: #121212;
+            --gray: #f8f9fa;
+            --text: #333;
+        }
+
+        body { 
+            font-family: 'Noto Sans Arabic', sans-serif; 
+            background: #f0f2f5; 
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--dark);
+        }
+
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        }
+
+        /* Notifications */
+        .alert {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-right: 5px solid #4caf50;
+        }
+
+        /* Form Styling */
+        .form-group {
+            background: var(--gray);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        input { 
+            flex: 1;
+            padding: 12px 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        button, .btn-update { 
+            padding: 12px 25px; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, opacity 0.2s;
+            text-decoration: none;
+        }
+
+        button { background: var(--primary); color: white; }
+        .btn-update { background: #007bff; color: white; }
+
+        button:hover, .btn-update:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Table Styling */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        th { 
+            background: var(--dark); 
+            color: white; 
+            padding: 15px; 
+            font-size: 14px;
+        }
+
+        td { 
+            padding: 15px; 
+            background: white;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .row-badge {
+            background: #eee;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .delete-btn { 
+            color: #ff4444; 
+            text-decoration: none; 
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .delete-btn:hover { text-decoration: underline; }
+
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .logout-link {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logout-link:hover { color: var(--primary); }
+
+        @media (max-width: 600px) {
+            .form-group { flex-direction: column; align-items: stretch; }
+            input { width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2><span class="material-icons-round">analytics</span> مدير مراقبة الجداول</h2>
+    </div>
+
+    <div class="card">
+        {% if msg == "started" %}
+        <div class="alert">
+            <span class="material-icons-round">sync</span>
+            <span>بدأ التحديث الشامل لجميع الجداول في الخلفية... انتظر بضع دقائق.</span>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <form method="POST" style="display: contents;">
+                <input type="text" name="sheet_id" placeholder="ID ملف قوقل شيت" required>
+                <input type="text" name="worksheet_name" placeholder="اسم الورقة" required>
+                <button type="submit">
+                    <span class="material-icons-round">add_circle</span> إضافة جدول
+                </button>
+            </form>
+            
+            <a href="/update_now" class="btn-update" onclick="this.innerHTML='جاري البدء...'">
+                <span class="material-icons-round">refresh</span> تحديث الكل
+            </a>
+        </div>
+
+        <h3>الجداول المراقبة حالياً</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم الورقة</th>
+                    <th>عدد الصفوف</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sheet in stored_sheets %}
+                <tr>
+                    <td style="font-weight: bold;">{{ sheet.name }}</td>
+                    <td><span class="row-badge">{{ sheet.rows }} صف</span></td>
+                    <td>
+                        <a href="{{ url_for('delete_sheet', index=loop.index0) }}" class="delete-btn" onclick="return confirm('هل أنت متأكد من حذف هذا الجدول؟')">
+                            <span class="material-icons-round" style="font-size: 18px;">delete</span> حذف
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not stored_sheets %}
+                <tr>
+                    <td colspan="3" style="color: #999; padding: 40px;">لا توجد جداول مضافة حالياً.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <span style="color: #aaa; font-size: 12px;">نظام التحديث التلقائي نشط (كل 6 ساعات)</span>
+            <a href="/logout" class="logout-link">
+                <span class="material-icons-round" style="font-size: 18px;">logout</span> تسجيل الخروج
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
